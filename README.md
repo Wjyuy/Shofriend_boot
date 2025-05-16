@@ -150,7 +150,8 @@
       *   `implementation 'javax.servlet:jstl:1.2'` 추가
 
 
-    기존 Spring legacy의 pom.xml
+  * 기존 Spring legacy의 pom.xml
+
     ```xml
       <java-version>11</java-version>
       <org.springframework-version>5.0.7.RELEASE</org.springframework-version>
@@ -178,7 +179,8 @@
       </dependency>
   ```
   
-  변경된 Spring boot Gradle 설정
+  * 변경된 Spring boot Gradle 설정
+
   ```gradle
   plugins {
     id 'java'
@@ -217,7 +219,7 @@
   ### 4. XML 설정 파일 마이그레이션
   * 스프링 레거시에서 XML로 관리되던 설정들을 스프링 부트 방식`application.properties/application.yml`으로 전환
 
-  기존 Spring legacy의 servlet-context.xml 
+  * 기존 Spring legacy의 servlet-context.xml 
   ```xml
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -253,7 +255,7 @@
 	</beans:bean>
   ```
 
-  변경된 Spring boot application.properties
+  * 변경된 Spring boot application.properties
 
   ```xml
 	spring.application.name=boot_shofriend
@@ -283,8 +285,8 @@
   ```
   ### 5. 데이터 접근(DAO/Mapper) 구조 마이그레이션
   * 레거시의 DAO/매퍼 구조를 스프링 부트 환경에 맞게 설정
-        *   **데이터 소스 설정**: 데이터베이스 연결 설정은 JNDI 대신 `application.properties/application.yml` 또는 `@Configuration` 클래스에서 `DataSource` 빈을 직접 설정하는 방식으로 변경
-        *   **Mapper 프레임워크 설정**:`MyBatis-Spring Boot Starter` 추가, 스프링 부트 설정에 맞게 \src\main\resources\mybatis\mappers 위치에, mybatis-config.xml 으로 설정정
+      *   **데이터 소스 설정**: 데이터베이스 연결 설정은 JNDI 대신 `application.properties/application.yml` 또는 `@Configuration` 클래스에서 `DataSource` 빈을 직접 설정하는 방식으로 변경
+      *   **Mapper 프레임워크 설정**:`MyBatis-Spring Boot Starter` 추가, 스프링 부트 설정에 맞게 \src\main\resources\mybatis\mappers 위치에, mybatis-config.xml 으로 설정정
   ### 6. 파일 위치, package에 따른 파일명 재설정
   * 레거시의 DTO/Controller/Service/ServiceImpl 구조를 스프링 부트 환경에 맞게 설정
 
@@ -336,13 +338,16 @@
       <td align="center">JSP</td>
     </tr>
     <tr>
-      <td><img src="./img/refactoring1.png" alt="Controller" width="400"></td>
-      <td><img src="./img/refactoring2.png" alt="JSP" width="400"></td>
+      <td><img src="./img/refactoring2.png" alt="Controller" width="400"></td>
+      <td><img src="./img/refactoring1.png" alt="JSP" width="400"></td>
     </tr>
   </table>
 
 ## 결제 기능
-  * 단품 결제, 장바구니 결제를 카카오페이 api를 활용하여 구현
+  * 장바구니 결제 전, 단품 결제 먼저 카카오페이 api를 활용하여 구현
+    * kakaopay developers와 kakao developers의 aid, test key 오인하는 실수
+    * Postman 활용하여 서버쪽 처리
+    * 
 
   <table>
     <tr>
@@ -363,12 +368,41 @@
     </tr>
   </table>
 
-  * 기존에는 model 에 각각의 list를 보내어 JSP 에서 출력할 때 여러 블록 단위를 사용해 출력
-    * 유지보수 시, 모든 블록단위를 수정하는 문제 발생
-  * 변경 후, MAP 으로 list들을 Group으로 묶어 보냄
-    * 구조적으로 안정적
-    * 메인화면에 출력을 유동적으로 설정 가능
+  * 장바구니 결제 구현
+    * 미리 제작하였던 단품결제와 기능을 합치기 위한 고민 존재
+    * DB에서 상품을 보내면, 장바구니에서 수정한 내용들이 반영되지 않음
+    * 따라서 배열로 장바구니에 담긴 상품들을 보내는 방향으로 결정
+    * JS로 데이터를 전송하기 위해, 인코딩 방식을 변경
+  * Header에 장바구니 Hover 이벤트 구현
+    * 전 페이지의 Header에 장바구니를 적용하여 사용자UI에 편리성 추가
+    * 전 페이지 수정을 하며, 유지보수 측면에서 페이지를 효율적으로 나누자고 다짐
 
+  <table>
+    <tr>
+      <td align="center">JS에서 상품id,수량 배열전송</td>
+      <td align="center">배열 전송 인코딩 방식 설정</td>
+    </tr>
+    <tr>
+      <td><img src="./img/checkouts (6).png" alt="1" width="400"></td>
+      <td><img src="./img/checkouts (7).png" alt="2" width="400"></td>
+    </tr>
+    <tr>
+      <td align="center">Controller도 배열[]로 수정</td>
+      <td align="center">가격계산도 배열만큼 반복</td>
+    </tr>
+    <tr>
+      <td><img src="./img/checkouts (3).png" alt="3" width="400"></td>
+      <td><img src="./img/checkouts (4).png" alt="4" width="400"></td>
+    </tr>
+    <tr>
+      <td align="center">장바구니 결제완료 시 장바구니에서 삭제</td>
+      <td align="center">전 페이지에서 hover 이벤트 위해 모델전송</td>
+    </tr>
+    <tr>
+      <td><img src="./img/checkouts (5).png" alt="5" width="400"></td>
+      <td><img src="./img/session.png" alt="6" width="400"></td>
+    </tr>
+  </table>
 
 
 ## 🔗 관련 링크
