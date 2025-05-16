@@ -23,6 +23,37 @@
   * **Web Server:** Tomcat
   * **Communication:** Slack, Jira
 
+## 설계
+
+### DB diagram을 사용한 erd 테이블 설계
+![erd](./img/erd.png)
+
+### 업무 흐름도
+<table>
+  <tr>
+    <td align="center">메인</td>
+    <td align="center">마이페이지</td>
+    <td align="center">장바구니</td>
+  </tr>
+  <tr>
+    <td><img src="./img/flow1.jpeg" alt="flow1" width="300"></td>
+    <td><img src="./img/flow2.jpeg" alt="flow2" width="300"></td>
+    <td><img src="./img/flow3.jpeg" alt="flow3" width="300"></td>
+  </tr>
+</table>
+
+### 서비스 설계단 흐름
+<table>
+  <tr>
+    <td align="center">사용자</td>
+    <td align="center">친구</td>
+  </tr>
+  <tr>
+    <td><img src="./img/userflow.png" alt="사용자 흐름도" width="400"></td>
+    <td><img src="./img/friendflow.png" alt="친구 흐름도" width="400"></td>
+  </tr>
+</table>
+
 ## Spring Boot에서 구현한 Spring Security구현 과정
   프로젝트에서 Spring Security는 시간관계상 사용하지 못했지만, 미리 적용해 본 경험을 작성
 
@@ -403,6 +434,24 @@
     </tr>
   </table>
 
+
+  
+## 결과
+
+  ### 메인 화면
+  ![메인](./img/main.png)
+  ![상품](./img/product.png)
+  ### 상품 상세
+  ![상세](./img/content.png)
+  ### 리뷰
+  ![리뷰](./img/review.png)
+  ### 친구
+  ![friend](./img/friend.png)
+  ![chat](./img/chat.png)
+  ### 결제
+  ![cart](./img/cart.png)
+  ![checkout](./img/checkout.png)
+  ![kakaopay](./img/kakaopay.png)
 
 ## 🔗 관련 링크
 
