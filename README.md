@@ -192,10 +192,76 @@
       *   `implementation 'org.springframework.boot:spring-boot-starter-web'` 추가
       *   `implementation 'javax.servlet:jstl:1.2'` 추가
 
-  레거시의 servlet-context.xml 
 
+    기존 Spring legacy의 pom.xml
+    ```xml
+      <java-version>11</java-version>
+      <org.springframework-version>5.0.7.RELEASE</org.springframework-version>
+      <org.aspectj-version>1.6.10</org.aspectj-version>
+      <org.slf4j-version>1.6.6</org.slf4j-version>
+    </properties>
+    <dependencies>
+      <!-- Spring -->
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>${org.springframework-version}</version>
+        <exclusions>
+          <!-- Exclude Commons Logging in favor of SLF4j -->
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>${org.springframework-version}</version>
+      </dependency>
+  ```
+  
+  변경된 Spring boot Gradle 설정
+  ```gradle
+  plugins {
+    id 'java'
+  //	id 'org.springframework.boot' version '3.4.4'
+    id 'org.springframework.boot' version '2.7.13'
+    id 'io.spring.dependency-management' version '1.1.7'
+  }
+  dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    //	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
+    implementation 'javax.servlet:jstl:1.2'
+    implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.20'
+    implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    //25.05.08 홍길동 websocket 의존성 추가 (채팅 기능에 필요)
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    //25.05.08 홍길동 카카오페이용 의존성 추가 
+    implementation 'org.apache.httpcomponents:httpclient'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+  }
+  ```
+
+  ### 2. 중복 레거시 의존성 제거
+  * `spring-boot-starter-web` 스타터에 이미 포함되어 있는 의존성들 (예: spring-context, spring-webmvc, spring-tx, spring-orm, tomcat-dbcp, javax.servlet-api, javax.servlet.jsp 등) 제거
+  ### 3. @SpringBootApplication 클래스 생성
+  * 스프링 부트 애플리케이션 시작점 역할인 메인 클래스 생성, `@SpringBootApplication 어노테이션` 추가
+      *   이 어노테이션은 `@Configuration`, `@EnableAutoConfiguration`, `@ComponentScan` 세 가지 어노테이션을 결합한 것으로, 스프링 빈 구성 정의, 스프링 부트 자동 구성 활성화, 지정된 패키지 및 하위 패키지에서 스프링 컴포넌트 스캔 활성화 등의 기능을 자동으로 처리
+  ### 4. XML 설정 파일 마이그레이션
+  * 스프링 레거시에서 XML로 관리되던 설정들을 스프링 부트 방식`application.properties/application.yml`으로 전환
+
+  기존 Spring legacy의 servlet-context.xml 
   ```xml
-
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<beans:property name="prefix" value="/WEB-INF/views/" />
@@ -230,36 +296,61 @@
 	</beans:bean>
   ```
 
-  변경된 Gradle 설정
-  ```gradle
-  plugins {
-    id 'java'
-  //	id 'org.springframework.boot' version '3.4.4'
-    id 'org.springframework.boot' version '2.7.13'
-    id 'io.spring.dependency-management' version '1.1.7'
-  }
-  dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    //	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
-    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1'
-    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
-    implementation 'javax.servlet:jstl:1.2'
-    implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.20'
-    implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.4'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    //25.05.08 홍길동 websocket 의존성 추가 (채팅 기능에 필요)
-    implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    //25.05.08 홍길동 카카오페이용 의존성 추가 
-    implementation 'org.apache.httpcomponents:httpclient'
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-  }
+  변경된 Spring boot application.properties
+
+  ```xml
+	spring.application.name=boot_shofriend
+  server.port=8485
+
+  #Server
+  server.servlet.session.timeout=30m
+
+  #Spring MVC
+  spring.mvc.view.prefix=/WEB-INF/views/
+  spring.mvc.view.suffix=.jsp
+
+  #Database config
+  #spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+  spring.datasource.driver-class-name=net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+  #spring.datasource.url=jdbc:mysql://localhost:3306/atom
+  spring.datasource.url=jdbc:log4jdbc:mysql://localhost:3306/atom
+  spring.datasource.username=bts
+  spring.datasource.password=1234
+
+  #mybatis config
+  mybatis.config-location=classpath:mybatis-config.xml
+
+  spring.mvc.static-locations=classpath:/static/,file:C:/develop/upload/
+  logging.level.org.springframework.web.client=DEBUG
+
   ```
+  ### 5. 데이터 접근(DAO/Mapper) 구조 마이그레이션
+  * 레거시의 DAO/매퍼 구조를 스프링 부트 환경에 맞게 설정
+        *   **데이터 소스 설정**: 데이터베이스 연결 설정은 JNDI 대신 `application.properties/application.yml` 또는 `@Configuration` 클래스에서 `DataSource` 빈을 직접 설정하는 방식으로 변경
+        *   **Mapper 프레임워크 설정**:`MyBatis-Spring Boot Starter` 추가, 스프링 부트 설정에 맞게 \src\main\resources\mybatis\mappers 위치에, mybatis-config.xml 으로 설정정
+  ### 6. 파일 위치, package에 따른 파일명 재설정
+  * 레거시의 DTO/Controller/Service/ServiceImpl 구조를 스프링 부트 환경에 맞게 설정
+
+  ## 디렉토리 구조
+  Shofriend
+　|　　⊢　java
+　|　　|　　⊢　com.boot.controller
+　|　　|　　⊢　com.boot.dao
+　|　　|　　⊢　com.boot.dto
+　|　　|　　⊢　com.boot.service
+　|　　|　　⊢　com.boot.websocket
+　|　　⊢　sesources
+　|　　|　　⊢　static
+　|　　|　　⊢　mybatis.mapper
+　|　　|　　⊢　mybatis-config.xml
+　|　　|　　⊢　application.properties
+　|　　⊢　src
+　|　　|　　⊢　main
+　|　　|　　|　　⊢　webapp
+　|　　|　　|　　|　　⊢　WEB-INF
+　|　　|　　|　　|　　|　　⊢　views
+　⊢　build.gradle
+　⊢ 　　⋮
 
 ## 🚀 주요 기능
 
