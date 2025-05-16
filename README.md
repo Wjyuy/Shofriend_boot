@@ -347,7 +347,6 @@
   * 장바구니 결제 전, 단품 결제 먼저 카카오페이 api를 활용하여 구현
     * kakaopay developers와 kakao developers의 aid, test key 오인하는 실수
     * Postman 활용하여 서버쪽 처리
-    * 
 
   <table>
     <tr>
