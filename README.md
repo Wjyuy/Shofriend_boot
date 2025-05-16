@@ -332,25 +332,25 @@
   * 레거시의 DTO/Controller/Service/ServiceImpl 구조를 스프링 부트 환경에 맞게 설정
 
   ## 디렉토리 구조
->  Shofriend
->　|　　⊢　java
->　|　　|　　⊢　com.boot.controller
->　|　　|　　⊢　com.boot.dao
->　|　　|　　⊢　com.boot.dto
->　|　　|　　⊢　com.boot.service
->　|　　|　　⊢　com.boot.websocket
->　|　　⊢　sesources
->　|　　|　　⊢　static
->　|　　|　　⊢　mybatis.mapper
->　|　　|　　⊢　mybatis-config.xml
->　|　　|　　⊢　application.properties
->　|　　⊢　src
->　|　　|　　⊢　main
->　|　　|　　|　　⊢　webapp
->　|　　|　　|　　|　　⊢　WEB-INF
->　|　　|　　|　　|　　|　　⊢　views
->　⊢　build.gradle
->　⊢ 　　⋮
+Shofriend
+├── build.gradle
+├── src
+│   └── main
+│       ├── java
+│       │   ├── com.boot.controller
+│       │   ├── com.boot.dao
+│       │   ├── com.boot.dto
+│       │   ├── com.boot.service
+│       │   └── com.boot.websocket
+│       ├── resources
+│       │   ├── application.properties
+│       │   ├── mybatis-config.xml
+│       │   └── mybatis.mapper
+│       └── webapp
+│           └── WEB-INF
+│               └── views
+└── ⋮ (etc files/directories)
+
 
 ## 🚀 주요 기능
 
