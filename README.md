@@ -289,7 +289,7 @@
 		<beans:constructor-arg index="0" ref="sqlSessionFactory"></beans:constructor-arg>
 	</beans:bean>	
 	
-	<!-- 	2025.04.08 파일입출력 우주연 -->
+	<!-- 	2025.04.08 파일입출력 홍길동  -->
 	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
 		<beans:property name="defaultEncoding" value="UTF-8"/>
 		<beans:property name="maxUploadSize" value="10485760"/>
@@ -332,24 +332,26 @@
   * 레거시의 DTO/Controller/Service/ServiceImpl 구조를 스프링 부트 환경에 맞게 설정
 
   ## 디렉토리 구조
-Shofriend
-├── build.gradle
-├── src
-│   └── main
-│       ├── java
-│       │   ├── com.boot.controller
-│       │   ├── com.boot.dao
-│       │   ├── com.boot.dto
-│       │   ├── com.boot.service
-│       │   └── com.boot.websocket
-│       ├── resources
-│       │   ├── application.properties
-│       │   ├── mybatis-config.xml
-│       │   └── mybatis.mapper
-│       └── webapp
-│           └── WEB-INF
-│               └── views
-└── ⋮ (etc files/directories)
+  ```text
+    Shofriend
+    ├── build.gradle
+    ├── src
+    │   └── main
+    │       ├── java
+    │       │   ├── com.boot.controller
+    │       │   ├── com.boot.dao
+    │       │   ├── com.boot.dto
+    │       │   ├── com.boot.service
+    │       │   └── com.boot.websocket
+    │       ├── resources
+    │       │   ├── application.properties
+    │       │   ├── mybatis-config.xml
+    │       │   └── mybatis.mapper
+    │       └── webapp
+    │           └── WEB-INF
+    │               └── views
+    └── ⋮ (etc files/directories)
+  ```
 
 
 ## 🚀 주요 기능
