@@ -67,40 +67,28 @@
   </tr>
 </table>
 
-## Spring legacy -> Spring boot 마이그레이션 과정
-
-Spring Boot와 Spring Security를 함께 사용하면, **보안이 강화된 강력한 웹 애플리케이션을 쉽게 구축**할 수 있습니다 [1].
-
-### 개요
-
-Spring Boot는 애플리케이션의 설정과 배포를 간소화하는 데 도움을 주며 [1], 개발자가 신속하게 애플리케이션을 구축할 수 있도록 기본 설정을 자동 처리해 줍니다 [2]. Spring Security는 **인증 및 권한 부여를 처리하는 데 강력한 도구를 제공**하며 [1], 애플리케이션에 강력한 보안 기능을 추가하는 데 사용됩니다 [2]. 이 두 기술을 결합하면, 복잡한 보안 요구 사항을 관리하면서도 생산성을 높일 수 있습니다 [1, 2].
-
-### Spring Boot와 Spring Security 통합 개요
-
-Spring Boot와 Spring Security를 결합하면 **보안이 강화된 애플리케이션을 손쉽게 구축**할 수 있습니다 [2].
+## Spring Boot에서 구현한 Spring Security구현 과정
 
 ### 기본 설정 및 구성
 
-1.  **Spring Boot 프로젝트 생성** [2]: Spring Initializr (https://start.spring.io)를 사용하면 프로젝트 생성이 매우 간편합니다 [2, 3].
-    *   **Project**: Gradle 선택 [2].
-    *   **Language**: Java 선택 [2].
-    *   **Spring Boot**: 최신 버전 선택 [2].
-    *   **Dependencies**: 'Spring Web', 'Spring Security' 선택 [2].
-    *   **Generate** 버튼 클릭하여 프로젝트 생성 [2].
-    *   생성된 프로젝트를 IDE (IntelliJ IDEA, Eclipse 등)로 가져옵니다 [3].
+1.  **Spring Boot 프로젝트 생성**
+    *   **Project**: Gradle
+    *   **Language**: Java
+    *   **Spring Boot**: 최신 버전
+    *   **Dependencies**: 'Spring Web', 'Spring Security'
+    *   **Generate** 버튼 클릭하여 프로젝트 생성
+    *   생성된 프로젝트를 IDE (Eclipse)로 불러온다
 
-2.  **Spring Security 설정** [3]: Spring Security는 기본적으로 모든 요청에 대해 인증을 요구하지만, 이를 커스터마이즈하여 애플리케이션의 보안 요구 사항에 맞게 조정할 수 있습니다 [3].
-
-    *   **기본 보안 설정** [3]: `application.properties` 또는 `application.yml` 파일에 기본 보안 설정을 추가할 수 있습니다. 예를 들어, 기본 로그인 페이지를 비활성화하거나 특정 경로에 대한 인증을 설정할 수 있습니다 [3].
+2.  **Spring Security 설정**
+    *   **기본 보안 설정** : `application.properties`에 기본 보안 설정을 추가(기본 로그인 페이지를 비활성화하거나 특정 경로에 대한 인증 설정)
 
         ```properties
         # application.properties 파일 예시
         spring.security.user.name=user
         spring.security.user.password=password
         ```
-        [3]
 
-    *   **Custom Security Configuration** [3]: 더 복잡한 보안 설정은 `SecurityConfig` 클래스를 작성하여 세부 설정을 커스터마이즈할 수 있습니다. 특정 URL 패턴 접근 제어, 사용자 정의 로그인 페이지 설정 등이 가능합니다 [3].
+    *   **Custom Security Configuration** (본 프로젝트에서는 적용하지 못 했지만, 더 복잡한 보안 설정은 `SecurityConfig` 클래스를 작성해 세부 설정 커스터마이징 가능 : 특정 URL 패턴 접근 제어, 사용자 정의 로그인 페이지 설정 등)
 
         ```java
         import org.springframework.context.annotation.Bean;
@@ -121,91 +109,157 @@ Spring Boot와 Spring Security를 결합하면 **보안이 강화된 애플리�
             protected void configure(HttpSecurity http) throws Exception {
                 http
                     .authorizeRequests()
-                    .antMatchers("/public/**").permitAll() // 공용 경로 [4, 5]
-                    .anyRequest().authenticated() // 나머지 요청은 인증 필요 [4, 5]
+                    .antMatchers("/public/**").permitAll() // 공용 경로 
+                    .anyRequest().authenticated() // 나머지 요청은 인증 필요 
                     .and()
                     .formLogin()
-                    .loginPage("/login") // 로그인 페이지 설정 [4, 6]
+                    .loginPage("/login")
                     .permitAll()
                     .and()
-                    .logout() // 로그아웃 설정 [4, 6]
+                    .logout() 
                     .permitAll();
             }
 
             @Override
             @Bean
             public UserDetailsService userDetailsService() {
-                UserDetailsService userDetailsService = new InMemoryUserDetailsManager(); // 인메모리 사용자 정보 서비스 [4, 5]
-                userDetailsService.createUser(User.withUsername("user").password("{noop}password").roles("USER").build()); // 사용자 생성 [4, 7]
+                UserDetailsService userDetailsService = new InMemoryUserDetailsManager(); // 인메모리 사용자 정보 서비스 
+                userDetailsService.createUser(User.withUsername("user").password("{noop}password").roles("USER").build()); // 사용자 생성
                 return userDetailsService;
             }
         }
         ```
-        위 예제에서는 `/public/**` 경로는 인증 없이 접근 가능하며, 나머지 경로는 인증을 요구합니다 [5]. 또한, 인메모리 사용자 세부 정보 서비스가 설정되어 있습니다 [4, 5].
+        위 예제에서는 `/public/**` 경로는 인증 없이 접근 가능, 나머지 경로는 인증 요구.
 
-3.  **사용자 인증과 권한 부여** [5]: 사용자 인증 및 권한 부여를 위해 `UserDetailsService`를 구현하여 사용자 정보를 제공할 수 있습니다 [5]. 예제에서는 메모리에 사용자 정보를 저장하는 간단한 구현을 사용했지만 [5], 실제 환경에서는 데이터베이스와 연동하는 것이 일반적입니다 [5, 6].
+3.  **사용자 인증과 권한 부여** : `UserDetailsService` 구현하여 사용자 정보 제공 ( 다음 프로젝트에서는 데이터베이스와 연동하여 볼 예정)
 
-    *   **UserDetailsService 예제** [5]:
+    *   **UserDetailsService 예제** :
 
         ```java
         import org.springframework.security.core.userdetails.UserDetails;
         import org.springframework.security.core.userdetails.UserDetailsService;
         import org.springframework.security.core.userdetails.UsernameNotFoundException;
         import org.springframework.stereotype.Service;
-        import org.springframework.security.core.userdetails.User; // User 클래스 import 추가 (소스에는 없으나 코드 완성 위해 추가)
+        import org.springframework.security.core.userdetails.User; // User 클래스
 
         @Service
         public class CustomUserDetailsService implements UserDetailsService {
 
             @Override
             public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-                // 실제 애플리케이션에서는 데이터베이스에서 사용자 정보를 가져오는 로직이 필요합니다. [5, 6]
-                if ("user".equals(username)) { // "user" 이름 처리 [5, 6]
+                // DB 로직
+                if ("user".equals(username)) { // "user" 이름 처리 
                     return User.withUsername("user")
-                               .password("{noop}password") // {noop} 필요 [7]
+                               .password("{noop}password") // {noop} 필요 
                                .roles("USER")
                                .build();
                 } else {
-                    throw new UsernameNotFoundException("User not found"); // 사용자 없을 시 예외 발생 [5]
+                    throw new UsernameNotFoundException("User not found"); // 사용자 없을 시 예외 발생 
                 }
             }
         }
         ```
-        이 예제는 사용자 이름이 "user"인 경우만 처리하며 [5, 6], 실제 환경에서는 데이터베이스에서 사용자 정보를 조회해야 합니다 [6].
+        예제는 사용자 이름이 "user"인 경우만 처리하며, 실제 환경에서는 데이터베이스에서 사용자 정보를 조회해야 한다
 
 ### 에러 처리 및 해결 방법
 
-*   **에러: 403 Forbidden** [6]: 사용자가 인증되었지만 접근이 거부된 경우 발생합니다. 보안 설정이나 권한 부여 설정 문제일 수 있습니다 [6].
-    *   **해결 방법** [6]:
-        1.  `HttpSecurity` 설정에서 URL 패턴과 권한을 올바르게 설정했는지 확인합니다 [6].
-        2.  로그인 페이지나 로그인 처리가 올바르게 설정되었는지 확인합니다 [6].
+*   **에러: 403 Forbidden**
+    *   **해결 방법**:
+        1.  `HttpSecurity` 설정에서 URL 패턴, 권한 설정 확인
+        2.  로그인 페이지나 로그인 처리 올바른지 확인
         ```java
         @Override protected void configure(HttpSecurity http) throws Exception {
             http
                 .authorizeRequests()
-                .antMatchers("/public/**").permitAll() // 확인 [6]
-                .anyRequest().authenticated() // 확인 [6]
+                .antMatchers("/public/**").permitAll() // 확인
+                .anyRequest().authenticated() // 확인
                 .and()
                 .formLogin()
-                .loginPage("/login") // 확인 [6]
+                .loginPage("/login") // 확인
                 .permitAll()
                 .and()
                 .logout()
                 .permitAll();
         }
         ```
-        [6]
+## Spring legacy -> Spring boot 마이그레이션 과정
 
-*   **에러: 401 Unauthorized** [7]: 인증이 실패했을 때 발생합니다. 사용자 이름과 비밀번호 설정 문제일 수 있습니다 [7].
-    *   **해결 방법** [7]:
-        1.  `UserDetailsService`에서 사용자 이름과 비밀번호가 올바르게 설정되었는지 확인합니다 [7].
-        2.  **비밀번호 암호화 설정이 올바른지 확인**합니다 [7]. `{noop}`은 평문 비밀번호를 사용할 때 필요합니다 [7].
-        ```java
-        userDetailsService.createUser(User.withUsername("user").password("{noop}password").roles("USER").build());
-        ```
-        [7]
+  ### 1. 스프링 부트 의존성 추가
 
-참고 문서로는 Spring Boot 공식 문서, Spring Security 공식 문서, Spring Security Configuration Guide가 있으며 [7], 이들은 설정 및 사용에 필요한 상세 정보를 제공합니다 [7].
+  *   Gradle 프로젝트 : `build.gradle` 파일에 스프링 부트 플러그인 및 관련 의존성 추가
+      *   `id 'org.springframework.boot' version '2.7.13'` 버전 다운
+      *   `implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1'` 버전 다운
+      *   `implementation 'org.springframework.boot:spring-boot-starter-web'` 추가
+      *   `implementation 'javax.servlet:jstl:1.2'` 추가
+
+  레거시의 servlet-context.xml 
+
+  ```xml
+
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>
+	
+	<context:component-scan base-package="com.lgy.ShoFriend" />
+	
+	<!-- 	dataSource 객체는 데이터베이스 정보 포함 -->
+	<beans:bean name="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<beans:property name="driverClassName" value="com.mysql.cj.jdbc.Driver"></beans:property>
+		<beans:property name="url" value="jdbc:mysql://localhost:3306/atom"></beans:property>
+		<beans:property name="username" value="bts"></beans:property>
+		<beans:property name="password" value="1234"></beans:property>
+	</beans:bean>
+
+	<beans:bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<beans:property name="dataSource" ref="dataSource"></beans:property>
+		<!-- 		sql 로 구성된 xml 경로 설정 -->
+		<beans:property name="mapperLocations" value="classpath:com/lgy/ShoFriend/dao/mapper/*.xml"></beans:property>
+	</beans:bean>
+	
+	<!-- 	SqlSessionTemplate 타입의 sqlSession 객체는 sqlSessionFactory 객체를 포함한다. -->
+	<beans:bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<beans:constructor-arg index="0" ref="sqlSessionFactory"></beans:constructor-arg>
+	</beans:bean>	
+	
+	<!-- 	2025.04.08 파일입출력 우주연 -->
+	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<beans:property name="defaultEncoding" value="UTF-8"/>
+		<beans:property name="maxUploadSize" value="10485760"/>
+	</beans:bean>
+  ```
+
+  변경된 Gradle 설정
+  ```gradle
+  plugins {
+    id 'java'
+  //	id 'org.springframework.boot' version '3.4.4'
+    id 'org.springframework.boot' version '2.7.13'
+    id 'io.spring.dependency-management' version '1.1.7'
+  }
+  dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    //	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
+    implementation 'javax.servlet:jstl:1.2'
+    implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.20'
+    implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    //25.05.08 홍길동 websocket 의존성 추가 (채팅 기능에 필요)
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    //25.05.08 홍길동 카카오페이용 의존성 추가 
+    implementation 'org.apache.httpcomponents:httpclient'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+  }
+  ```
 
 ## 🚀 주요 기능
 
